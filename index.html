@@ -1,0 +1,1333 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>2026 東京深秋繪本之旅 🍁｜錦糸町・楓葉・銀杏・鎌倉</title>
+  <!-- 引入 Tailwind CSS 作為排版輔助 -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- 引入 Google Fonts 圓體與開源粉圓體 CDN -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Varela+Round&family=Zen+Maru+Gothic:wght@500;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jf-openhuninn-1.1@1.1.0/font/jf-openhuninn.min.css">
+
+  <style>
+    /* ==========================================
+       色彩與繪本風格變數定義 (嚴格無漸層、平塗色塊)
+       ========================================== */
+    :root {
+      --bg-washi: #FFFCF6;       /* 和紙白 */
+      --ink-gray: #3E3A39;       /* 墨灰粗線與文字 */
+      --coral-pink: #F2A497;     /* 珊瑚粉 */
+      --yamabuki-yellow: #F6D27A;/* 山吹黃 */
+      --mizu-blue: #A8D3E6;      /* 水色 */
+      --wakatake-green: #B9DAA5; /* 若竹綠 */
+      --card-cream: #FFF7E8;     /* 淺米紙色 */
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      background-color: #F3EFE6; /* 桌機外圍微深和紙底，凸顯手機繪本外框 */
+      color: var(--ink-gray);
+      font-family: 'jf-openhuninn-1.1', 'Huninn', 'Zen Maru Gothic', 'Varela Round', sans-serif;
+      margin: 0;
+      padding: 0;
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    /* 手機優先繪本主容器 */
+    .storybook-container {
+      max-width: 540px;
+      margin: 0 auto;
+      background-color: var(--bg-washi);
+      min-height: 100vh;
+      border-left: 3px solid var(--ink-gray);
+      border-right: 3px solid var(--ink-gray);
+      position: relative;
+      padding-bottom: 48px;
+      /* 繪本紙張微點陣背景（純色平塗圓點） */
+      background-image: radial-gradient(var(--ink-gray) 0.75px, transparent 0.75px);
+      background-size: 24px 24px;
+      background-position: 0 0;
+    }
+
+    /* 覆蓋一層淺和紙白讓點陣更柔和 */
+    .storybook-inner {
+      background-color: rgba(255, 252, 246, 0.93);
+      min-height: 100vh;
+    }
+
+    @media (max-width: 540px) {
+      .storybook-container {
+        border-left: none;
+        border-right: none;
+      }
+    }
+
+    /* ==========================================
+       3px 墨灰粗框與平塗硬陰影元件
+       ========================================== */
+    .ehon-card {
+      background-color: var(--bg-washi);
+      border: 3px solid var(--ink-gray);
+      border-radius: 22px;
+      box-shadow: 4px 4px 0px var(--ink-gray);
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .ehon-card-sm {
+      background-color: var(--bg-washi);
+      border: 3px solid var(--ink-gray);
+      border-radius: 16px;
+      box-shadow: 3px 3px 0px var(--ink-gray);
+    }
+
+    .ehon-btn {
+      border: 3px solid var(--ink-gray);
+      border-radius: 16px;
+      box-shadow: 3px 3px 0px var(--ink-gray);
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 0.12s ease, box-shadow 0.12s ease, background-color 0.15s ease;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      user-select: none;
+    }
+
+    .ehon-btn:active {
+      transform: translate(2px, 2px);
+      box-shadow: 1px 1px 0px var(--ink-gray);
+    }
+
+    .ehon-badge {
+      border: 2.5px solid var(--ink-gray);
+      border-radius: 999px;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 2px 10px;
+      font-size: 0.8rem;
+      box-shadow: 2px 2px 0px var(--ink-gray);
+    }
+
+    /* 主題平塗色塊 Class */
+    .bg-washi { background-color: var(--bg-washi); }
+    .bg-coral { background-color: var(--coral-pink); }
+    .bg-yellow { background-color: var(--yamabuki-yellow); }
+    .bg-mizu { background-color: var(--mizu-blue); }
+    .bg-green { background-color: var(--wakatake-green); }
+    .bg-cream { background-color: var(--card-cream); }
+    .text-ink { color: var(--ink-gray); }
+
+    /* ==========================================
+       繪本插圖與切換動畫 (含無障礙減少動態支援)
+       ========================================== */
+    @keyframes floatSlow {
+      0%, 100% { transform: translateY(0px) rotate(0deg); }
+      50% { transform: translateY(-6px) rotate(1.5deg); }
+    }
+
+    @keyframes swayGentle {
+      0%, 100% { transform: rotate(-3deg); }
+      50% { transform: rotate(3deg); }
+    }
+
+    @keyframes trainMove {
+      0%, 100% { transform: translateX(0px) translateY(0px); }
+      25% { transform: translateX(2px) translateY(-1.5px); }
+      75% { transform: translateX(-2px) translateY(0px); }
+    }
+
+    @keyframes leafFall {
+      0%, 100% { transform: translateY(0px) rotate(-6deg); }
+      50% { transform: translateY(5px) rotate(8deg); }
+    }
+
+    /* Q 彈切換進場效果 */
+    @keyframes bounceInCard {
+      0% {
+        opacity: 0;
+        transform: scale(0.92) translateY(14px);
+      }
+      70% {
+        opacity: 1;
+        transform: scale(1.02) translateY(-3px);
+      }
+      100% {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+      }
+    }
+
+    .anim-float { animation: floatSlow 3.6s ease-in-out infinite; }
+    .anim-sway { animation: swayGentle 3s ease-in-out infinite; transform-origin: top center; }
+    .anim-train { animation: trainMove 2.2s ease-in-out infinite; }
+    .anim-leaf { animation: leafFall 3.2s ease-in-out infinite; }
+
+    .bounce-enter {
+      animation: bounceInCard 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    }
+
+    /* 完整支援減少動態效果設定 */
+    @media (prefers-reduced-motion: reduce) {
+      html {
+        scroll-behavior: auto;
+      }
+      .anim-float,
+      .anim-sway,
+      .anim-train,
+      .anim-leaf,
+      .bounce-enter {
+        animation: none !important;
+        transition: none !important;
+        transform: none !important;
+      }
+    }
+
+    /* 時間軸直線 */
+    .timeline-line {
+      position: absolute;
+      left: 19px;
+      top: 12px;
+      bottom: 12px;
+      width: 3px;
+      background-color: var(--ink-gray);
+    }
+
+    /* 自訂打勾框繪本樣式 */
+    .ehon-checkbox {
+      width: 26px;
+      height: 26px;
+      border: 3px solid var(--ink-gray);
+      border-radius: 8px;
+      background-color: var(--bg-washi);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: background-color 0.15s ease, transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .checklist-item.checked .ehon-checkbox {
+      background-color: var(--wakatake-green);
+      transform: scale(1.06);
+    }
+
+    .checklist-item.checked .item-text {
+      text-decoration: line-through;
+      opacity: 0.65;
+    }
+
+    /* 隱藏捲軸但保留滑動功能 */
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="storybook-container">
+    <div class="storybook-inner">
+
+      <!-- ==========================================
+           1. 頂端固定選單 (Sticky Navbar)
+           ========================================== -->
+      <header class="sticky top-0 z-50 bg-washi border-b-[3px] border-[#3E3A39] px-3 py-2.5">
+        <div class="flex items-center justify-between gap-1.5">
+          <a href="#hero-section" class="ehon-btn bg-coral px-2.5 py-1.5 text-xs sm:text-sm flex-1 text-center">
+            ✈️ 首頁/航班
+          </a>
+          <a href="#itinerary-section" class="ehon-btn bg-yellow px-2.5 py-1.5 text-xs sm:text-sm flex-1 text-center">
+            🗓️ 每日行程
+          </a>
+          <a href="#kinshicho-section" class="ehon-btn bg-mizu px-2.5 py-1.5 text-xs sm:text-sm flex-1 text-center">
+            🛍️ 錦糸町生活
+          </a>
+          <a href="#checklist-section" class="ehon-btn bg-green px-2.5 py-1.5 text-xs sm:text-sm flex-1 text-center">
+            ☑️ 清單檢查
+          </a>
+        </div>
+      </header>
+
+      <main class="px-4 pt-5 space-y-8">
+
+        <!-- ==========================================
+             2. 首頁插圖 ＋ 標題 ＋ 出發倒數
+             ========================================== -->
+        <section id="hero-section" class="scroll-mt-16">
+          <div class="ehon-card p-5 bg-cream relative overflow-hidden">
+
+            <!-- 頂部小裝飾貼紙標籤 -->
+            <div class="flex justify-between items-center mb-2">
+              <span class="ehon-badge bg-yellow">🍁 TOKYO TRIP 2026</span>
+              <span class="ehon-badge bg-green">6 DAYS 5 NIGHTS</span>
+            </div>
+
+            <!-- 首頁手繪風 SVG 插圖：晴空塔 + 淺草雷門燈籠 + 星宇飛機 + 銀杏與楓葉 -->
+            <div class="my-3 bg-washi border-[3px] border-[#3E3A39] rounded-2xl p-3 relative">
+              <svg viewBox="0 0 420 210" class="w-full h-auto overflow-visible" aria-label="東京深秋繪本主視覺插畫">
+                <!-- 天空背景裝飾圓塊 (平塗水色與山吹黃) -->
+                <circle cx="340" cy="48" r="28" fill="#F6D27A" stroke="#3E3A39" stroke-width="3" />
+                <!-- 雲朵 1 -->
+                <g class="anim-float">
+                  <path d="M40 55 H95 A14 14 0 0 0 95 27 A18 18 0 0 0 62 20 A15 15 0 0 0 40 35 A10 10 0 0 0 40 55 Z" fill="#A8D3E6" stroke="#3E3A39" stroke-width="3" stroke-linejoin="round"/>
+                </g>
+
+                <!-- 遠景富士山 (左下) -->
+                <g>
+                  <path d="M12 185 L68 105 L98 105 L154 185 Z" fill="#A8D3E6" stroke="#3E3A39" stroke-width="3" stroke-linejoin="round"/>
+                  <path d="M53 126 L68 105 L98 105 L113 126 L98 122 L88 130 L78 121 L66 129 Z" fill="#FFFCF6" stroke="#3E3A39" stroke-width="3" stroke-linejoin="round"/>
+                </g>
+
+                <!-- 東京晴空塔 (中央偏右) -->
+                <g>
+                  <!-- 塔尖天線 -->
+                  <line x1="215" y1="10" x2="215" y2="42" stroke="#3E3A39" stroke-width="3" stroke-linecap="round"/>
+                  <circle cx="215" cy="10" r="4.5" fill="#F2A497" stroke="#3E3A39" stroke-width="2.5"/>
+                  <!-- 上層展望台 -->
+                  <rect x="201" y="42" width="28" height="10" rx="4" fill="#A8D3E6" stroke="#3E3A39" stroke-width="3"/>
+                  <!-- 塔身中段 -->
+                  <path d="M204 52 L196 95 L234 95 L226 52 Z" fill="#FFFCF6" stroke="#3E3A39" stroke-width="3" stroke-linejoin="round"/>
+                  <!-- 下層展望台 -->
+                  <rect x="190" y="95" width="50" height="14" rx="5" fill="#A8D3E6" stroke="#3E3A39" stroke-width="3"/>
+                  <line x1="196" y1="102" x2="234" y2="102" stroke="#3E3A39" stroke-width="2.5"/>
+                  <!-- 塔身下半部 -->
+                  <path d="M195 109 L178 185 L252 185 L235 109 Z" fill="#FFFCF6" stroke="#3E3A39" stroke-width="3" stroke-linejoin="round"/>
+                  <!-- 晴空塔幾何交叉結構線 -->
+                  <line x1="195" y1="109" x2="244" y2="150" stroke="#3E3A39" stroke-width="2.5"/>
+                  <line x1="235" y1="109" x2="186" y2="150" stroke="#3E3A39" stroke-width="2.5"/>
+                  <line x1="186" y1="150" x2="252" y2="185" stroke="#3E3A39" stroke-width="2.5"/>
+                  <line x1="244" y1="150" x2="178" y2="185" stroke="#3E3A39" stroke-width="2.5"/>
+                </g>
+
+                <!-- 淺草雷門大燈籠 (右側搖擺動畫) -->
+                <g class="anim-sway" style="transform-origin: 330px 92px;">
+                  <!-- 吊掛線 -->
+                  <line x1="330" y1="88" x2="330" y2="102" stroke="#3E3A39" stroke-width="3"/>
+                  <!-- 燈籠上下黑蓋 -->
+                  <rect x="312" y="100" width="36" height="8" rx="3" fill="#3E3A39"/>
+                  <rect x="312" y="160" width="36" height="8" rx="3" fill="#3E3A39"/>
+                  <!-- 燈籠珊瑚紅本體 -->
+                  <ellipse cx="330" cy="134" rx="34" ry="30" fill="#F2A497" stroke="#3E3A39" stroke-width="3"/>
+                  <!-- 燈籠橫紋 -->
+                  <path d="M299 122 Q330 128 361 122" fill="none" stroke="#3E3A39" stroke-width="2.5"/>
+                  <path d="M299 146 Q330 152 361 146" fill="none" stroke="#3E3A39" stroke-width="2.5"/>
+                  <!-- 雷門牌子 -->
+                  <rect x="319" y="114" width="22" height="40" rx="4" fill="#FFFCF6" stroke="#3E3A39" stroke-width="2.5"/>
+                  <text x="330" y="131" text-anchor="middle" font-size="11" font-weight="900" fill="#3E3A39">雷</text>
+                  <text x="330" y="147" text-anchor="middle" font-size="11" font-weight="900" fill="#3E3A39">門</text>
+                  <!-- 底部流蘇 -->
+                  <path d="M320 168 L320 178 M327 168 L327 180 M334 168 L334 180 M340 168 L340 178" stroke="#F6D27A" stroke-width="3" stroke-linecap="round"/>
+                </g>
+
+                <!-- 星宇航空飛機 (左上方漂浮) -->
+                <g class="anim-float" style="animation-delay: 0.4s;">
+                  <g transform="translate(115, 32) rotate(-8)">
+                    <!-- 機身 -->
+                    <path d="M0 20 C15 12, 52 12, 66 20 C52 28, 15 28, 0 20 Z" fill="#FFFCF6" stroke="#3E3A39" stroke-width="3" stroke-linejoin="round"/>
+                    <!-- 尾翼 (山吹金/曜石黑意象) -->
+                    <path d="M4 18 L-6 4 L10 4 L16 16 Z" fill="#F6D27A" stroke="#3E3A39" stroke-width="3" stroke-linejoin="round"/>
+                    <!-- 主機翼 -->
+                    <path d="M26 22 L18 35 L33 35 L42 22 Z" fill="#B9DAA5" stroke="#3E3A39" stroke-width="3" stroke-linejoin="round"/>
+                    <!-- 機窗 -->
+                    <circle cx="48" cy="19" r="2" fill="#3E3A39"/>
+                    <circle cx="39" cy="19" r="2" fill="#3E3A39"/>
+                    <circle cx="30" cy="19" r="2" fill="#3E3A39"/>
+                  </g>
+                </g>
+
+                <!-- 銀杏葉 (左側飄落) -->
+                <g class="anim-leaf" transform="translate(32, 95)">
+                  <path d="M20 30 L20 42" stroke="#3E3A39" stroke-width="3" stroke-linecap="round"/>
+                  <path d="M20 30 C4 26, 2 8, 16 12 C18 13, 20 18, 20 18 C20 18, 22 13, 24 12 C38 8, 36 26, 20 30 Z" fill="#F6D27A" stroke="#3E3A39" stroke-width="3" stroke-linejoin="round"/>
+                </g>
+
+                <!-- 楓葉 (右上飄落) -->
+                <g class="anim-leaf" style="animation-delay: 1.2s;" transform="translate(262, 48)">
+                  <path d="M18 32 L18 42" stroke="#3E3A39" stroke-width="3" stroke-linecap="round"/>
+                  <path d="M18 32 L7 28 L11 21 L4 14 L13 14 L18 4 L23 14 L32 14 L25 21 L29 28 Z" fill="#F2A497" stroke="#3E3A39" stroke-width="3" stroke-linejoin="round"/>
+                </g>
+
+                <!-- 地面草叢與步道線 -->
+                <path d="M8 185 H412" stroke="#3E3A39" stroke-width="3.5" stroke-linecap="round"/>
+                <circle cx="155" cy="182" r="9" fill="#B9DAA5" stroke="#3E3A39" stroke-width="3"/>
+                <circle cx="170" cy="180" r="12" fill="#B9DAA5" stroke="#3E3A39" stroke-width="3"/>
+                <circle cx="268" cy="181" r="11" fill="#F6D27A" stroke="#3E3A39" stroke-width="3"/>
+              </svg>
+            </div>
+
+            <!-- 標題與副標題 -->
+            <div class="text-center mt-4">
+              <h1 class="text-2xl sm:text-3xl font-black tracking-tight text-ink">
+                2026 東京深秋繪本之旅 🍁
+              </h1>
+              <p class="mt-1.5 text-sm sm:text-base font-bold bg-washi inline-block px-3 py-1 rounded-xl border-2 border-[#3E3A39]">
+                2026.11.27 (五) — 12.02 (三) ｜ 6天5夜<br class="sm:hidden"> 錦糸町・楓葉・銀杏・鎌倉
+              </p>
+            </div>
+
+            <!-- 出發倒數計時器（四格繪本小牌子） -->
+            <div class="mt-5 pt-4 border-t-[3px] border-dashed border-[#3E3A39]">
+              <div class="flex items-center justify-between mb-2.5">
+                <span class="text-xs sm:text-sm font-bold flex items-center gap-1.5">
+                  ⏰ 距離 11/27 08:00 出發還有：
+                </span>
+                <span id="countdown-status" class="ehon-badge bg-coral text-xs">準備出發！</span>
+              </div>
+
+              <div class="grid grid-cols-4 gap-2.5 text-center">
+                <div class="ehon-card-sm bg-coral py-2.5 px-1">
+                  <div id="cd-days" class="text-2xl sm:text-3xl font-black leading-none">15</div>
+                  <div class="text-xs font-bold mt-1">天 (Days)</div>
+                </div>
+                <div class="ehon-card-sm bg-yellow py-2.5 px-1">
+                  <div id="cd-hours" class="text-2xl sm:text-3xl font-black leading-none">22</div>
+                  <div class="text-xs font-bold mt-1">時 (Hrs)</div>
+                </div>
+                <div class="ehon-card-sm bg-mizu py-2.5 px-1">
+                  <div id="cd-mins" class="text-2xl sm:text-3xl font-black leading-none">15</div>
+                  <div class="text-xs font-bold mt-1">分 (Mins)</div>
+                </div>
+                <div class="ehon-card-sm bg-green py-2.5 px-1">
+                  <div id="cd-secs" class="text-2xl sm:text-3xl font-black leading-none">00</div>
+                  <div class="text-xs font-bold mt-1">秒 (Secs)</div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </section>
+
+        <!-- ==========================================
+             3. 航班與機場直達交通攻略卡片
+             ========================================== -->
+        <section class="space-y-4">
+          <div class="flex items-center gap-2">
+            <span class="ehon-badge bg-mizu text-sm px-3 py-1">✈️ 航班 ＆ 機場交通</span>
+            <span class="text-xs font-bold opacity-80">星宇航空・成田T2直達錦糸町</span>
+          </div>
+
+          <!-- 航班資訊卡 (水色平塗主題) -->
+          <div class="ehon-card bg-mizu p-4 space-y-3">
+            <div class="flex items-center justify-between">
+              <span class="font-black text-base flex items-center gap-1.5">
+                🌟 星宇航空 STARLUX
+              </span>
+              <span class="ehon-badge bg-washi">成田第二航廈 (T2)</span>
+            </div>
+
+            <!-- 去程 -->
+            <div class="ehon-card-sm bg-washi p-3.5">
+              <div class="flex justify-between items-center border-b-2 border-dashed border-[#3E3A39] pb-2 mb-2">
+                <span class="ehon-badge bg-coral">去程｜11/27 (五)</span>
+                <span class="font-black text-sm">JX892</span>
+              </div>
+              <div class="flex items-center justify-between text-center">
+                <div class="text-left">
+                  <div class="text-xs font-bold opacity-75">台中清泉崗</div>
+                  <div class="text-xl font-black">RMQ</div>
+                </div>
+                <div class="flex-1 px-3 flex flex-col items-center">
+                  <span class="text-xs font-bold bg-yellow px-2 py-0.5 rounded-full border-2 border-[#3E3A39]">13:25 抵達</span>
+                  <div class="w-full h-[3px] bg-[#3E3A39] my-1.5 relative"></div>
+                  <span class="text-[11px] font-bold">預計 15:20 出關</span>
+                </div>
+                <div class="text-right">
+                  <div class="text-xs font-bold opacity-75">東京成田 T2</div>
+                  <div class="text-xl font-black">NRT</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 回程 -->
+            <div class="ehon-card-sm bg-washi p-3.5">
+              <div class="flex justify-between items-center border-b-2 border-dashed border-[#3E3A39] pb-2 mb-2">
+                <span class="ehon-badge bg-yellow">回程｜12/02 (三)</span>
+                <span class="font-black text-sm">JX893</span>
+              </div>
+              <div class="flex items-center justify-between text-center">
+                <div class="text-left">
+                  <div class="text-xs font-bold opacity-75">東京成田 T2</div>
+                  <div class="text-xl font-black">NRT</div>
+                </div>
+                <div class="flex-1 px-3 flex flex-col items-center">
+                  <span class="text-xs font-bold bg-green px-2 py-0.5 rounded-full border-2 border-[#3E3A39]">滿載而歸</span>
+                  <div class="w-full h-[3px] bg-[#3E3A39] my-1.5"></div>
+                  <span class="text-[11px] font-bold">T2 免稅店採買</span>
+                </div>
+                <div class="text-right">
+                  <div class="text-xs font-bold opacity-75">台中清泉崗</div>
+                  <div class="text-xl font-black">RMQ</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 機場直達飯店交通攻略卡 (附 JR Green Car 電車插圖) -->
+          <div class="ehon-card bg-washi p-4 space-y-3">
+            <div class="flex items-center justify-between">
+              <h3 class="font-black text-base">🚃 成田 T2 ➝ 錦糸町 交通攻略</h3>
+              <!-- JR 綠色車廂小插圖 -->
+              <svg width="78" height="40" viewBox="0 0 78 40" class="anim-train shrink-0" aria-label="JR總武線快速綠色車廂">
+                <rect x="4" y="6" width="68" height="26" rx="7" fill="#A8D3E6" stroke="#3E3A39" stroke-width="2.5"/>
+                <rect x="4" y="18" width="68" height="6" fill="#F6D27A" stroke="#3E3A39" stroke-width="2"/>
+                <rect x="10" y="9" width="12" height="7" rx="2" fill="#FFFCF6" stroke="#3E3A39" stroke-width="2"/>
+                <rect x="26" y="9" width="12" height="7" rx="2" fill="#FFFCF6" stroke="#3E3A39" stroke-width="2"/>
+                <!-- Green Car 四葉草標誌色塊 -->
+                <rect x="46" y="9" width="18" height="7" rx="2" fill="#B9DAA5" stroke="#3E3A39" stroke-width="2"/>
+                <circle cx="18" cy="34" r="4" fill="#3E3A39"/>
+                <circle cx="58" cy="34" r="4" fill="#3E3A39"/>
+              </svg>
+            </div>
+
+            <!-- 方案 A：首推直達 -->
+            <div class="ehon-card-sm bg-green p-3.5 space-y-2">
+              <div class="flex flex-wrap items-center justify-between gap-1">
+                <span class="ehon-badge bg-coral">★ 方案 A｜首推免轉乘直達</span>
+                <span class="text-xs font-black bg-washi px-2 py-0.5 rounded-lg border-2 border-[#3E3A39]">16:01 發車・約 80-90 分</span>
+              </div>
+              <div class="font-black text-base">
+                JR 總武線快速（成田第2航廈 ➝ 錦糸町）
+              </div>
+              <div class="bg-washi border-2 border-[#3E3A39] rounded-xl p-2.5 text-xs space-y-1">
+                <p class="font-bold">💡 舒適升級秘笈（基本車資 ¥1,340 + Green券）：</p>
+                <p>1. 進站前先用 Apple Pay <strong>Mobile Suica</strong> 購買「<strong>Green Car（綠色車廂）</strong>」雙層座位券。</p>
+                <p>2. 在月台找綠色車廂（第 4、5 節車廂）上車，用手機輕觸座位上方感應區，<strong>紅燈變綠燈</strong>即可舒適放行李一路坐到錦糸町！</p>
+              </div>
+            </div>
+
+            <!-- 方案 B：備案轉乘 -->
+            <div class="ehon-card-sm bg-cream p-3 space-y-1.5">
+              <div class="flex flex-wrap items-center justify-between gap-1">
+                <span class="ehon-badge bg-yellow">方案 B｜備案轉乘</span>
+                <span class="text-xs font-black">15:55 發車</span>
+              </div>
+              <div class="font-bold text-sm">
+                京成 Access 特急 ➝ 押上站（轉半藏門線 1 站即達錦糸町）
+              </div>
+              <p class="text-xs opacity-85">若提早出關剛好趕上 15:55 班次可搭，押上站同月台/電梯轉乘也很順暢。</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==========================================
+             4. 每日行程 (6 個日期切換按鈕 + Q彈時間軸)
+             ========================================== -->
+        <section id="itinerary-section" class="scroll-mt-16 space-y-4">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <span class="ehon-badge bg-yellow text-sm px-3 py-1">🗓️ 每日行程表</span>
+              <span class="text-xs font-bold opacity-80">點選日期切換</span>
+            </div>
+          </div>
+
+          <!-- 6 個日期切換按鈕 (2x3 或橫向自適應繪本按鈕) -->
+          <div class="grid grid-cols-3 sm:grid-cols-6 gap-2" id="day-tabs-container">
+            <button onclick="selectDay(1)" id="day-tab-1" class="ehon-btn py-2 px-1 flex-col bg-coral">
+              <span class="text-xs font-black">Day 1</span>
+              <span class="text-[11px]">11/27 (五)</span>
+            </button>
+            <button onclick="selectDay(2)" id="day-tab-2" class="ehon-btn py-2 px-1 flex-col bg-washi">
+              <span class="text-xs font-black">Day 2</span>
+              <span class="text-[11px]">11/28 (六)</span>
+            </button>
+            <button onclick="selectDay(3)" id="day-tab-3" class="ehon-btn py-2 px-1 flex-col bg-washi">
+              <span class="text-xs font-black">Day 3</span>
+              <span class="text-[11px]">11/29 (日)</span>
+            </button>
+            <button onclick="selectDay(4)" id="day-tab-4" class="ehon-btn py-2 px-1 flex-col bg-washi">
+              <span class="text-xs font-black">Day 4</span>
+              <span class="text-[11px]">11/30 (一)</span>
+            </button>
+            <button onclick="selectDay(5)" id="day-tab-5" class="ehon-btn py-2 px-1 flex-col bg-washi">
+              <span class="text-xs font-black">Day 5</span>
+              <span class="text-[11px]">12/01 (二)</span>
+            </button>
+            <button onclick="selectDay(6)" id="day-tab-6" class="ehon-btn py-2 px-1 flex-col bg-washi">
+              <span class="text-xs font-black">Day 6</span>
+              <span class="text-[11px]">12/02 (三)</span>
+            </button>
+          </div>
+
+          <!-- 當日行程主題卡與時間軸容器 -->
+          <div id="day-content-wrapper" class="ehon-card bg-cream p-4 bounce-enter">
+            <!-- 由 JavaScript 動態渲染當日插畫、標題與時間軸節點 -->
+          </div>
+        </section>
+
+        <!-- ==========================================
+             5. 住宿資訊 ＆ 錦糸町飯店周邊生活圈指南
+             ========================================== -->
+        <section id="kinshicho-section" class="scroll-mt-16 space-y-4">
+          <div class="flex items-center gap-2">
+            <span class="ehon-badge bg-coral text-sm px-3 py-1">🏨 住宿 ＆ 錦糸町生活圈</span>
+            <span class="text-xs font-bold opacity-80">連住5晚免搬行李！</span>
+          </div>
+
+          <!-- 住宿卡片 -->
+          <div class="ehon-card bg-washi p-4 space-y-3">
+            <div class="flex items-start justify-between gap-2">
+              <div>
+                <span class="ehon-badge bg-green mb-1.5">連住 5 晚大本營</span>
+                <h3 class="font-black text-lg leading-snug">
+                  東京錦糸町京成里士滿飯店
+                </h3>
+                <p class="text-xs font-bold opacity-80">
+                  Keisei Richmond Hotel Tokyo Kinshicho
+                </p>
+              </div>
+              <!-- 飯店可愛小插畫 -->
+              <svg width="58" height="58" viewBox="0 0 60 60" class="shrink-0 anim-float">
+                <rect x="12" y="10" width="36" height="44" rx="5" fill="#F6D27A" stroke="#3E3A39" stroke-width="3"/>
+                <rect x="18" y="17" width="8" height="8" rx="2" fill="#FFFCF6" stroke="#3E3A39" stroke-width="2.5"/>
+                <rect x="34" y="17" width="8" height="8" rx="2" fill="#FFFCF6" stroke="#3E3A39" stroke-width="2.5"/>
+                <rect x="18" y="30" width="8" height="8" rx="2" fill="#FFFCF6" stroke="#3E3A39" stroke-width="2.5"/>
+                <rect x="34" y="30" width="8" height="8" rx="2" fill="#FFFCF6" stroke="#3E3A39" stroke-width="2.5"/>
+                <rect x="24" y="42" width="12" height="12" fill="#F2A497" stroke="#3E3A39" stroke-width="2.5"/>
+                <line x1="6" y1="54" x2="54" y2="54" stroke="#3E3A39" stroke-width="3" stroke-linecap="round"/>
+              </svg>
+            </div>
+
+            <div class="bg-cream border-2 border-[#3E3A39] rounded-xl p-3 text-xs space-y-1.5">
+              <div class="flex items-center gap-1.5 font-bold">
+                <span>📍 位置優勢：</span>
+                <span>JR 錦糸町站南口 / 東京メトロ半藏門線 1 號出口步行即達</span>
+              </div>
+              <div class="flex items-center gap-1.5 font-bold">
+                <span>🕒 入住 / 退房：</span>
+                <span>11/27 (五) 14:00 後入住 ～ 12/02 (三) 11:00 前退房</span>
+              </div>
+            </div>
+
+            <!-- 周邊機能分類切換按鈕 -->
+            <div class="pt-2">
+              <div class="text-xs font-black mb-2">👇 點選查看錦糸町散步 5 分鐘生活機能：</div>
+              <div class="grid grid-cols-2 gap-2" id="kinshicho-tabs">
+                <button onclick="selectKinshichoCategory('malls')" id="ks-tab-malls" class="ehon-btn bg-coral py-2 px-3 text-xs sm:text-sm justify-start gap-1.5">
+                  🛍️ 百貨與大型商場
+                </button>
+                <button onclick="selectKinshichoCategory('supermarket')" id="ks-tab-supermarket" class="ehon-btn bg-washi py-2 px-3 text-xs sm:text-sm justify-start gap-1.5">
+                  🛒 超市與藥妝雜貨
+                </button>
+                <button onclick="selectKinshichoCategory('food')" id="ks-tab-food" class="ehon-btn bg-washi py-2 px-3 text-xs sm:text-sm justify-start gap-1.5">
+                  🍜 周邊必吃美食
+                </button>
+                <button onclick="selectKinshichoCategory('cvs')" id="ks-tab-cvs" class="ehon-btn bg-washi py-2 px-3 text-xs sm:text-sm justify-start gap-1.5">
+                  🏪 便利商店補給
+                </button>
+              </div>
+            </div>
+
+            <!-- 周邊機能詳細內容展示框 -->
+            <div id="kinshicho-detail-box" class="ehon-card-sm bg-cream p-3.5 bounce-enter">
+              <!-- 由 JS 渲染對應分類 -->
+            </div>
+          </div>
+        </section>
+
+        <!-- ==========================================
+             6. 可打勾的互動清單 (localStorage 儲存 + 進度條)
+             ========================================== -->
+        <section id="checklist-section" class="scroll-mt-16 space-y-4">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <span class="ehon-badge bg-green text-sm px-3 py-1">☑️ 行前準備 ＆ 打包清單</span>
+            </div>
+            <button onclick="resetCurrentChecklist()" class="ehon-btn bg-washi px-2.5 py-1 text-xs">
+              🔄 重置本頁勾選
+            </button>
+          </div>
+
+          <div class="ehon-card bg-washi p-4 space-y-4">
+            <!-- 三個清單切換 Tab -->
+            <div class="grid grid-cols-3 gap-2">
+              <button onclick="selectChecklistTab('todo')" id="cl-tab-todo" class="ehon-btn bg-yellow py-2 px-2 text-xs sm:text-sm">
+                🎫 待辦事項
+              </button>
+              <button onclick="selectChecklistTab('pretrip')" id="cl-tab-pretrip" class="ehon-btn bg-washi py-2 px-2 text-xs sm:text-sm">
+                🛂 出發前檢查
+              </button>
+              <button onclick="selectChecklistTab('luggage')" id="cl-tab-luggage" class="ehon-btn bg-washi py-2 px-2 text-xs sm:text-sm">
+                🧳 行李打包
+              </button>
+            </div>
+
+            <!-- 完成進度條 -->
+            <div class="bg-cream border-[3px] border-[#3E3A39] rounded-2xl p-3">
+              <div class="flex justify-between items-center text-xs font-black mb-1.5">
+                <span id="progress-label">完成進度</span>
+                <span id="progress-count">0 / 0 (0%)</span>
+              </div>
+              <div class="w-full h-4 bg-washi border-2 border-[#3E3A39] rounded-full overflow-hidden">
+                <div id="progress-bar-fill" class="h-full bg-green transition-all duration-300" style="width: 0%;"></div>
+              </div>
+            </div>
+
+            <!-- 清單項目容器 -->
+            <div id="checklist-items-container" class="space-y-2.5 bounce-enter">
+              <!-- 由 JS 渲染勾選清單 -->
+            </div>
+          </div>
+        </section>
+
+        <!-- 頁尾繪本簽名欄 -->
+        <footer class="pt-4 pb-6 text-center">
+          <div class="inline-block ehon-card-sm bg-cream px-5 py-3">
+            <p class="text-xs font-black">🍁 2026 東京深秋繪本之旅・旅途平安開心 🍁</p>
+            <p class="text-[11px] font-bold opacity-75 mt-0.5">Created with Storybook Style ｜ 自動儲存勾選紀錄</p>
+          </div>
+        </footer>
+
+      </main>
+    </div>
+  </div>
+
+  <!-- ==========================================
+       JavaScript 邏輯：倒數計時、每日行程切換、生活圈、LocalStorage 清單
+       ========================================== -->
+  <script>
+    /* ------------------------------------------
+       1. 即時出發倒數計時器 (目標：2026-11-27T08:00:00+08:00)
+       ------------------------------------------ */
+    const targetTripDate = new Date('2026-11-27T08:00:00+08:00').getTime();
+
+    function updateCountdown() {
+      const now = new Date().getTime();
+      const diff = targetTripDate - now;
+
+      const daysEl = document.getElementById('cd-days');
+      const hoursEl = document.getElementById('cd-hours');
+      const minsEl = document.getElementById('cd-mins');
+      const secsEl = document.getElementById('cd-secs');
+      const statusEl = document.getElementById('countdown-status');
+
+      if (diff <= 0) {
+        daysEl.textContent = '00';
+        hoursEl.textContent = '00';
+        minsEl.textContent = '00';
+        secsEl.textContent = '00';
+        statusEl.textContent = '🎉 旅程進行中 / 已出發！';
+        statusEl.className = 'ehon-badge bg-green text-xs';
+        return;
+      }
+
+      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+      const secs = Math.floor((diff % (1000 * 60)) / 1000);
+
+      daysEl.textContent = String(days).padStart(2, '0');
+      hoursEl.textContent = String(hours).padStart(2, '0');
+      minsEl.textContent = String(mins).padStart(2, '0');
+      secsEl.textContent = String(secs).padStart(2, '0');
+    }
+
+    setInterval(updateCountdown, 1000);
+    updateCountdown();
+
+    /* ------------------------------------------
+       2. 每日行程資料庫 (Day 1 ~ Day 6，含專屬手繪 SVG 插圖)
+       ------------------------------------------ */
+    const itineraryData = {
+      1: {
+        dayNum: 'Day 1',
+        dateStr: '11/27 (五)',
+        title: '抵達東京・錦糸町初探',
+        themeBg: 'bg-mizu',
+        svgIllustration: `
+          <svg width="72" height="52" viewBox="0 0 72 52" class="anim-train shrink-0">
+            <rect x="4" y="10" width="64" height="28" rx="8" fill="#A8D3E6" stroke="#3E3A39" stroke-width="3"/>
+            <rect x="4" y="24" width="64" height="6" fill="#F6D27A" stroke="#3E3A39" stroke-width="2.5"/>
+            <rect x="11" y="14" width="14" height="8" rx="2" fill="#FFFCF6" stroke="#3E3A39" stroke-width="2.5"/>
+            <rect x="30" y="14" width="14" height="8" rx="2" fill="#B9DAA5" stroke="#3E3A39" stroke-width="2.5"/>
+            <rect x="49" y="14" width="12" height="8" rx="2" fill="#FFFCF6" stroke="#3E3A39" stroke-width="2.5"/>
+            <circle cx="18" cy="42" r="4.5" fill="#3E3A39"/>
+            <circle cx="54" cy="42" r="4.5" fill="#3E3A39"/>
+          </svg>
+        `,
+        events: [
+          {
+            time: '13:25',
+            title: '抵達東京成田機場 T2',
+            desc: '搭乘星宇航空 JX892 平安降落成田第二航廈，預計約 15:20 完成入境手續與領取行李。',
+            transport: '星宇航空 JX892',
+            transportColor: 'bg-mizu',
+            mustGo: false
+          },
+          {
+            time: '16:01',
+            title: '搭乘 JR 總武線快速 Green Car 直達錦糸町',
+            desc: '進站前先用 Apple Pay Mobile Suica 購買綠色車廂座位券，上車刷頭頂感應燈（紅變綠），免轉乘直達錦糸町站！',
+            transport: 'JR 總武線快速 + Mobile Suica',
+            transportColor: 'bg-green',
+            mustGo: false
+          },
+          {
+            time: '17:30',
+            title: '入住「東京錦糸町京成里士滿飯店」',
+            desc: 'Keisei Richmond Hotel Tokyo Kinshicho 辦理入住，放下行李稍作休息。',
+            transport: '步行 2 分鐘',
+            transportColor: 'bg-yellow',
+            mustGo: false
+          },
+          {
+            time: '18:30',
+            title: '錦糸町 PARCO / アルカキット (Arcakit) 晚餐與採買',
+            desc: '飯店對面就是 PARCO 百貨，北口有 Arcakit 與 LIFE 大型超市，輕鬆吃晚餐並採買第一晚日本水果與零食！',
+            transport: '步行即達',
+            transportColor: 'bg-yellow',
+            mustGo: true
+          }
+        ]
+      },
+      2: {
+        dayNum: 'Day 2',
+        dateStr: '11/28 (六)',
+        title: '淺草下町風情・晴空塔夜景',
+        themeBg: 'bg-coral',
+        svgIllustration: `
+          <svg width="64" height="54" viewBox="0 0 64 54" class="anim-sway shrink-0">
+            <rect x="20" y="6" width="24" height="6" rx="2" fill="#3E3A39"/>
+            <ellipse cx="32" cy="27" rx="22" ry="18" fill="#F2A497" stroke="#3E3A39" stroke-width="3"/>
+            <rect x="25" y="14" width="14" height="26" rx="3" fill="#FFFCF6" stroke="#3E3A39" stroke-width="2.5"/>
+            <text x="32" y="26" text-anchor="middle" font-size="8" font-weight="900" fill="#3E3A39">雷</text>
+            <text x="32" y="36" text-anchor="middle" font-size="8" font-weight="900" fill="#3E3A39">門</text>
+            <rect x="20" y="42" width="24" height="5" rx="2" fill="#3E3A39"/>
+          </svg>
+        `,
+        events: [
+          {
+            time: '09:30',
+            title: '淺草寺雷門・仲見世通散步吃美食',
+            desc: '晨間參拜淺草寺，在仲見世通品嚐人形燒、炸肉餅、抹茶甜點，感受濃厚下町風情。',
+            transport: '東京メトロ半藏門線 / 都營淺草線',
+            transportColor: 'bg-yellow',
+            mustGo: true
+          },
+          {
+            time: '13:00',
+            title: '隅田川步道散步（Tokyo Mizumachi）前往押上',
+            desc: '沿著隅田川跨過步道橋（Sumida River Walk），邊拍晴空塔倒影邊逛高架橋下文青小店前往押上。',
+            transport: '景觀散步',
+            transportColor: 'bg-green',
+            mustGo: false
+          },
+          {
+            time: '15:00',
+            title: '東京晴空塔 (Tokyo Skytree) 展望台 ＆ Solamachi 商店街',
+            desc: '登上晴空塔欣賞黃昏與華燈初上的東京全景，並在 Solamachi 逛吉卜力橡子共和國、寶可夢中心與伴手禮。',
+            transport: '押上站共構',
+            transportColor: 'bg-mizu',
+            mustGo: true
+          },
+          {
+            time: '19:00',
+            title: '押上站搭半藏門線 1 站回錦糸町晚餐',
+            desc: '只要搭 1 站（約 2 分鐘）即回到錦糸町！晚餐享用敘敘苑燒肉或真鯛拉麵麵魚。',
+            transport: '東京メトロ半藏門線 (1站)',
+            transportColor: 'bg-yellow',
+            mustGo: false
+          }
+        ]
+      },
+      3: {
+        dayNum: 'Day 3',
+        dateStr: '11/29 (日)',
+        title: '鎌倉高校前・江之島海街漫遊',
+        themeBg: 'bg-green',
+        svgIllustration: `
+          <svg width="72" height="52" viewBox="0 0 72 52" class="anim-train shrink-0">
+            <!-- 江之電經典綠黃配色電車 -->
+            <rect x="6" y="10" width="60" height="30" rx="8" fill="#B9DAA5" stroke="#3E3A39" stroke-width="3"/>
+            <path d="M6 25 H66" stroke="#F6D27A" stroke-width="5"/>
+            <path d="M6 23 H66 M6 27 H66" stroke="#3E3A39" stroke-width="2"/>
+            <rect x="13" y="14" width="12" height="8" rx="2" fill="#FFFCF6" stroke="#3E3A39" stroke-width="2.5"/>
+            <rect x="30" y="14" width="12" height="8" rx="2" fill="#FFFCF6" stroke="#3E3A39" stroke-width="2.5"/>
+            <rect x="47" y="14" width="12" height="8" rx="2" fill="#FFFCF6" stroke="#3E3A39" stroke-width="2.5"/>
+            <circle cx="20" cy="43" r="4" fill="#3E3A39"/>
+            <circle cx="52" cy="43" r="4" fill="#3E3A39"/>
+          </svg>
+        `,
+        events: [
+          {
+            time: '08:30',
+            title: '錦糸町搭乘 JR 總武線快速（直通橫須賀線）直達鎌倉！',
+            desc: '住錦糸町的最大優勢！不需轉車，一車到底直達鎌倉站（約 65 分鐘），還可再加購 Green Car 吃早餐看風景。',
+            transport: 'JR 總武-橫須賀線直通',
+            transportColor: 'bg-mizu',
+            mustGo: false
+          },
+          {
+            time: '10:00',
+            title: '鶴岡八幡宮 ＆ 小町通商店街美食巡禮',
+            desc: '參拜鎌倉代表神社鶴岡八幡宮，沿著熱鬧的小町通品嚐吻仔魚丼、抹茶冰淇淋與現烤仙貝。',
+            transport: '步行漫遊',
+            transportColor: 'bg-yellow',
+            mustGo: true
+          },
+          {
+            time: '13:00',
+            title: '轉乘江之電：長谷寺（大佛）＆ 鎌倉高校前平交道看海',
+            desc: '搭乘復古可愛的綠色江之電，造訪高德院鎌倉大佛、長谷寺，並在經典的「鎌倉高校前」平交道眺望湘南海岸。',
+            transport: '江之電',
+            transportColor: 'bg-green',
+            mustGo: true
+          },
+          {
+            time: '15:30',
+            title: '江之島弁財天仲見世通・夕陽海景',
+            desc: '漫步跨海大橋登上江之島，品嚐超大章魚仙貝，天氣晴朗時還能遠眺富士山與金色海面夕陽。',
+            transport: '江之電 / 步行',
+            transportColor: 'bg-yellow',
+            mustGo: false
+          },
+          {
+            time: '18:30',
+            title: '返回錦糸町休息',
+            desc: '從鎌倉或大船站搭乘 JR 橫須賀-總武快速線一車直達回錦糸町。',
+            transport: 'JR 橫須賀-總武線直通',
+            transportColor: 'bg-mizu',
+            mustGo: false
+          }
+        ]
+      },
+      4: {
+        dayNum: 'Day 4',
+        dateStr: '11/30 (一)',
+        title: '銀杏大道・吉卜力童話・澀谷高空夜景',
+        themeBg: 'bg-yellow',
+        svgIllustration: `
+          <svg width="68" height="54" viewBox="0 0 68 54" class="anim-float shrink-0">
+            <!-- 銀杏葉與吉卜力風小森林煤炭精靈意象 -->
+            <path d="M22 38 L22 48" stroke="#3E3A39" stroke-width="3" stroke-linecap="round"/>
+            <path d="M22 38 C6 34, 4 14, 18 18 C20 19, 22 24, 22 24 C22 24, 24 19, 26 18 C40 14, 38 34, 22 38 Z" fill="#F6D27A" stroke="#3E3A39" stroke-width="3" stroke-linejoin="round"/>
+            <circle cx="48" cy="32" r="13" fill="#3E3A39"/>
+            <circle cx="44" cy="30" r="4" fill="#FFFCF6"/>
+            <circle cx="52" cy="30" r="4" fill="#FFFCF6"/>
+            <circle cx="44" cy="30" r="1.8" fill="#3E3A39"/>
+            <circle cx="52" cy="30" r="1.8" fill="#3E3A39"/>
+          </svg>
+        `,
+        events: [
+          {
+            time: '09:00',
+            title: '明治神宮外苑 銀杏並木大道（金黃銀杏隧道拍照）',
+            desc: '11月底正是東京銀杏最金黃燦爛的時刻！漫步在雙排高聳的金色銀杏大道與滿地黃葉地毯拍照留念。',
+            transport: 'JR 中央・總武線 / 半藏門線 (青山一丁目)',
+            transportColor: 'bg-yellow',
+            mustGo: true
+          },
+          {
+            time: '12:30',
+            title: '前往三鷹站，搭乘龍貓黃色接駁巴士',
+            desc: '從信濃町或新宿搭乘 JR 中央線前往三鷹站，於南口轉乘吉卜力彩繪黃色社區巴士。',
+            transport: 'JR 中央線 + 接駁巴士',
+            transportColor: 'bg-yellow',
+            mustGo: false
+          },
+          {
+            time: '13:30',
+            title: '三鷹之森吉卜力美術館（預約制童話世界）',
+            desc: '走進宮崎駿的手稿與動畫世界，觀看館內限定短篇動畫，並與頂樓花園的《天空之城》巨神兵合照！',
+            transport: 'JR 中央線',
+            transportColor: 'bg-green',
+            mustGo: true
+          },
+          {
+            time: '17:00',
+            title: '澀谷 SHIBUYA SKY 展望台（絕美夕陽與東京鐵塔夜景）',
+            desc: '從吉祥寺/三鷹搭京王井之頭線直達澀谷，登上 360 度露天展望台欣賞東京鐵塔夜景，回程搭半藏門線直達錦糸町。',
+            transport: '京王井之頭線 / 半藏門線直達回飯店',
+            transportColor: 'bg-mizu',
+            mustGo: true
+          }
+        ]
+      },
+      5: {
+        dayNum: 'Day 5',
+        dateStr: '12/01 (二)',
+        title: '六義園賞楓・錦糸町大採購',
+        themeBg: 'bg-coral',
+        svgIllustration: `
+          <svg width="66" height="54" viewBox="0 0 66 54" class="anim-leaf shrink-0">
+            <!-- 楓紅與購物提袋插畫 -->
+            <path d="M22 36 L22 46" stroke="#3E3A39" stroke-width="3" stroke-linecap="round"/>
+            <path d="M22 36 L10 31 L15 23 L7 16 L17 16 L22 6 L27 16 L37 16 L29 23 L34 31 Z" fill="#F2A497" stroke="#3E3A39" stroke-width="3" stroke-linejoin="round"/>
+            <rect x="38" y="22" width="22" height="24" rx="4" fill="#F6D27A" stroke="#3E3A39" stroke-width="3"/>
+            <path d="M43 22 V17 A6 6 0 0 1 55 17 V22" fill="none" stroke="#3E3A39" stroke-width="3"/>
+          </svg>
+        `,
+        events: [
+          {
+            time: '09:30',
+            title: '六義園（東京最美迴遊式庭園・深秋楓紅倒影）',
+            desc: '12月初正是六義園紅葉見頃！欣賞傳統日本庭園的湖畔楓紅、渡月橋與吹上茶屋抹茶體驗。',
+            transport: 'JR 總武線轉山手線至駒込站',
+            transportColor: 'bg-green',
+            mustGo: true
+          },
+          {
+            time: '13:30',
+            title: '東京車站 / 丸之內銀杏大道散步與午茶',
+            desc: '造訪復古紅磚東京車站與行幸通銀杏大道，在丸之內享用精緻甜點午茶與購買東京車站限定伴手禮。',
+            transport: 'JR 山手線 / 總武線快速',
+            transportColor: 'bg-mizu',
+            mustGo: false
+          },
+          {
+            time: '16:30',
+            title: '返回錦糸町終極採買：阿卡將本舖、Uniqlo、唐吉訶德、LIFE 超市',
+            desc: '一站式把戰利品買齊！Arcakit 5F 阿卡將本舖、Uniqlo、24H 唐吉訶德藥妝，最後去 LIFE 超市買日本草莓與消夜，買完直接提回飯店打包！',
+            transport: '錦糸町生活圈步行',
+            transportColor: 'bg-coral',
+            mustGo: true
+          }
+        ]
+      },
+      6: {
+        dayNum: 'Day 6',
+        dateStr: '12/02 (三)',
+        title: '最後補貨・滿載而歸',
+        themeBg: 'bg-mizu',
+        svgIllustration: `
+          <svg width="70" height="52" viewBox="0 0 70 52" class="anim-float shrink-0">
+            <g transform="translate(5, 10) rotate(-6)">
+              <path d="M0 20 C15 12, 48 12, 60 20 C48 28, 15 28, 0 20 Z" fill="#FFFCF6" stroke="#3E3A39" stroke-width="3"/>
+              <path d="M4 18 L-4 6 L10 6 L16 16 Z" fill="#F6D27A" stroke="#3E3A39" stroke-width="3"/>
+              <path d="M24 22 L16 34 L30 34 L38 22 Z" fill="#A8D3E6" stroke="#3E3A39" stroke-width="3"/>
+            </g>
+          </svg>
+        `,
+        events: [
+          {
+            time: '09:00',
+            title: '飯店悠閒早餐 ＆ 錦糸公園散步看晴空塔',
+            desc: '享用豐盛早餐，到錦糸公園拍下近距離的晴空塔街景，做最後的悠閒巡禮。',
+            transport: '步行漫遊',
+            transportColor: 'bg-green',
+            mustGo: false
+          },
+          {
+            time: '10:30',
+            title: '退房，錦糸町站搭 JR 總武線快速（Green Car）直達成田機場 T2',
+            desc: '拉著滿滿戰利品行李箱，從錦糸町搭乘 JR 總武線快速 Green Car，免轉車輕鬆直達成田機場第二航廈。',
+            transport: 'JR 總武線快速 (Green Car)',
+            transportColor: 'bg-mizu',
+            mustGo: false
+          },
+          {
+            time: '12:30',
+            title: '成田機場第二航廈免稅店伴手禮採購，搭機返台',
+            desc: '搭乘星宇航空 JX893 班機返回台中清泉崗機場 (RMQ)，為 6天5夜 東京深秋繪本之旅畫下完美句點！',
+            transport: '星宇航空 JX893',
+            transportColor: 'bg-yellow',
+            mustGo: false
+          }
+        ]
+      }
+    };
+
+    let currentDay = 1;
+
+    function selectDay(dayNumber) {
+      currentDay = dayNumber;
+
+      // 更新 6 個日期按鈕樣式
+      for (let i = 1; i <= 6; i++) {
+        const btn = document.getElementById(`day-tab-${i}`);
+        if (i === dayNumber) {
+          btn.className = 'ehon-btn py-2 px-1 flex-col bg-coral scale-[1.03]';
+        } else {
+          btn.className = 'ehon-btn py-2 px-1 flex-col bg-washi opacity-90';
+        }
+      }
+
+      // 取得當日資料並渲染
+      const data = itineraryData[dayNumber];
+      const wrapper = document.getElementById('day-content-wrapper');
+
+      // 重新觸發 Q 彈動畫
+      wrapper.classList.remove('bounce-enter');
+      void wrapper.offsetWidth; // 強制 Reflow
+      wrapper.classList.add('bounce-enter');
+
+      const eventsHtml = data.events.map((ev) => `
+        <div class="relative pl-11 pb-5 last:pb-1">
+          <!-- 時間軸圓點 -->
+          <div class="w-5 h-5 rounded-full ${ev.mustGo ? 'bg-coral' : 'bg-yellow'} border-[3px] border-[#3E3A39] absolute left-[10px] top-1.5 z-10"></div>
+
+          <!-- 時間軸單張卡片 -->
+          <div class="ehon-card-sm bg-washi p-3.5 space-y-2">
+            <div class="flex flex-wrap items-center justify-between gap-1.5">
+              <span class="font-black text-sm px-2.5 py-0.5 rounded-lg bg-cream border-2 border-[#3E3A39]">
+                🕒 ${ev.time}
+              </span>
+              <div class="flex flex-wrap items-center gap-1.5">
+                ${ev.mustGo ? '<span class="ehon-badge bg-coral text-xs">★ 必去</span>' : ''}
+              </div>
+            </div>
+
+            <h4 class="font-black text-base leading-snug">${ev.title}</h4>
+            <p class="text-xs sm:text-sm font-medium opacity-90 leading-relaxed">${ev.desc}</p>
+
+            <div class="pt-1">
+              <span class="ehon-badge ${ev.transportColor} text-xs">
+                🚃 ${ev.transport}
+              </span>
+            </div>
+          </div>
+        </div>
+      `).join('');
+
+      wrapper.innerHTML = `
+        <!-- 當日頂部標題與手繪插圖 -->
+        <div class="ehon-card-sm ${data.themeBg} p-3.5 mb-4 flex items-center justify-between gap-3">
+          <div>
+            <div class="flex items-center gap-2 mb-1">
+              <span class="ehon-badge bg-washi text-xs">${data.dayNum}｜${data.dateStr}</span>
+            </div>
+            <h3 class="font-black text-lg sm:text-xl leading-tight">${data.title}</h3>
+          </div>
+          ${data.svgIllustration}
+        </div>
+
+        <!-- 時間軸列表 -->
+        <div class="relative mt-2">
+          <div class="timeline-line"></div>
+          ${eventsHtml}
+        </div>
+      `;
+    }
+
+    /* ------------------------------------------
+       3. 錦糸町飯店周邊生活圈指南切換邏輯
+       ------------------------------------------ */
+    const kinshichoData = {
+      malls: {
+        title: '🛍️ 百貨與大型商場（走路 1~5 分鐘）',
+        bg: 'bg-coral',
+        items: [
+          { name: '錦糸町 PARCO（飯店正對面）', desc: '過馬路即達！內有 無印良品 MUJI、LoFt、美食街與多間質感服飾雜貨。' },
+          { name: 'Arcakit 錦糸町（アルカキット・車站北口）', desc: '必逛地標！5F 有超大型「阿卡將本舖 (Akachan Honpo)」，還有 Uniqlo、GU、大創百元店 Daiso。' },
+          { name: 'Termina（テルミナ・車站共構）', desc: '與 JR 錦糸町站共構，B1 有伴手禮甜點街，樓上有 Yodobashi Camera 電器行與餐廳。' },
+          { name: 'Olinas Mall（オリナス）', desc: '錦糸公園北側大型購物商場，逛街空間寬敞舒適。' }
+        ]
+      },
+      supermarket: {
+        title: '🛒 超市與藥妝雜貨（買草莓消夜首選）',
+        bg: 'bg-yellow',
+        items: [
+          { name: 'LIFE 大型超市（錦糸町站北口 / PARCO 旁）', desc: '買當季日本草莓、麝香葡萄、生魚片熟食、限定零食與牛奶回飯店吃消夜的第一首選！' },
+          { name: '唐吉訶德 Don Quijote（北口步行即達）', desc: '24 小時營業，半夜隨時可以去補貨藥妝、休足時間與日本零嘴。' },
+          { name: '北野 Ace（PARCO / Termina 內）', desc: '質感日本各地精選調味料、咖哩包、高湯包與特色伴手禮超市。' },
+          { name: '松本清 / 大國藥妝 / OS Drug', desc: '車站南北口周邊藥妝店密集，比價補貨超方便。' }
+        ]
+      },
+      food: {
+        title: '🍜 錦糸町周邊必吃美食清單',
+        bg: 'bg-mizu',
+        items: [
+          { name: '真鯛拉麵 麵魚（真鯛らーめん 麺魚）', desc: '錦糸町超人氣排隊名店！濃郁鮮甜的愛媛宇和島真鯛魚湯頭配炙燒叉燒。' },
+          { name: '敘敘苑燒肉（錦糸町 PARCO / 南口）', desc: '高空景觀頂級和牛燒肉，午間套餐 CP 值超高！' },
+          { name: '一蘭拉麵（錦糸町店）', desc: '距離飯店步行 2 分鐘，宵夜來一碗天然豚骨拉麵超滿足。' },
+          { name: 'Shake Shack / 星乃珈琲店 / 鳥貴族', desc: 'Termina 一樓有 Shake Shack 漢堡，早餐可吃星乃珈琲店舒芙蕾熱鬆餅，宵夜有鳥貴族串燒。' }
+        ]
+      },
+      cvs: {
+        title: '🏪 便利商店補給（下樓 1 分鐘即達）',
+        bg: 'bg-green',
+        items: [
+          { name: '7-Eleven（飯店旁步行 1 分鐘）', desc: '隨時買熱咖啡、炸雞、布丁與使用 ATM 提款。' },
+          { name: 'FamilyMart 全家便利商店', desc: '必吃 Famichiki 脆皮炸雞與舒芙蕾布丁。' },
+          { name: 'Lawson 羅森便利商店', desc: '必買 Uchi Café 瑞士捲甜點與炸雞君（からあげクン）。' }
+        ]
+      }
+    };
+
+    function selectKinshichoCategory(catKey) {
+      const keys = ['malls', 'supermarket', 'food', 'cvs'];
+      keys.forEach(k => {
+        const btn = document.getElementById(`ks-tab-${k}`);
+        if (k === catKey) {
+          btn.className = 'ehon-btn bg-coral py-2 px-3 text-xs sm:text-sm justify-start gap-1.5';
+        } else {
+          btn.className = 'ehon-btn bg-washi py-2 px-3 text-xs sm:text-sm justify-start gap-1.5 opacity-90';
+        }
+      });
+
+      const data = kinshichoData[catKey];
+      const box = document.getElementById('kinshicho-detail-box');
+      box.classList.remove('bounce-enter');
+      void box.offsetWidth;
+      box.classList.add('bounce-enter');
+
+      box.innerHTML = `
+        <div class="ehon-badge ${data.bg} mb-2.5 text-xs">${data.title}</div>
+        <div class="space-y-2">
+          ${data.items.map(item => `
+            <div class="bg-washi border-2 border-[#3E3A39] rounded-xl p-2.5">
+              <div class="font-black text-sm">${item.name}</div>
+              <div class="text-xs mt-0.5 opacity-90">${item.desc}</div>
+            </div>
+          `).join('')}
+        </div>
+      `;
+    }
+
+    /* ------------------------------------------
+       4. 可打勾互動清單 (支援 localStorage 自動保存)
+       ------------------------------------------ */
+    const STORAGE_KEY = 'tokyo_2026_ehon_checklists_v1';
+
+    const defaultChecklists = {
+      todo: {
+        title: '🎫 待辦事項清單',
+        items: [
+          { id: 'todo_1', text: '預約「三鷹之森吉卜力美術館」門票（每月10日開放下個月）', note: '必搶！11/30 場次' },
+          { id: 'todo_2', text: '預約「澀谷 SHIBUYA SKY」黃昏時段門票', note: '熱門時段需提早搶票' },
+          { id: 'todo_3', text: '填寫 Visit Japan Web (VJW) 並截圖 QR Code', note: '加速成田入境與免稅' },
+          { id: 'todo_4', text: 'iPhone Apple Pay 綁定 Mobile Suica 並儲值日幣', note: '買 Green Car 座位超方便' },
+          { id: 'todo_5', text: '確認日本上網漫遊 / 購買 eSIM', note: '確認雙人網路暢通' }
+        ]
+      },
+      pretrip: {
+        title: '🛂 出發前檢查清單',
+        items: [
+          { id: 'pre_1', text: '中華民國護照（確認效期滿 6 個月以上）', note: '隨身攜帶' },
+          { id: 'pre_2', text: '日幣現金 ＆ 海外高回饋信用卡（準備 2 張以上）', note: '日本小店與交通備用' },
+          { id: 'pre_3', text: '行動電源（必須隨身攜帶，不可託運！）', note: '拍照查地圖必備' },
+          { id: 'pre_4', text: '手機充電線、多孔快充頭', note: '日本雙平腳插座免轉接' },
+          { id: 'pre_5', text: '個人常備藥品（腸胃藥、止痛感冒藥、OK繃、眼藥水）', note: '安心出遊' }
+        ]
+      },
+      luggage: {
+        title: '🧳 行李打包清單（11月底深秋穿搭）',
+        items: [
+          { id: 'lug_1', text: '防風保暖外套 / 大衣（11月底東京早晚約 7~15°C）', note: '洋蔥式穿法，室內有暖氣' },
+          { id: 'lug_2', text: '好走防滑的球鞋（日行萬步必備）', note: '鎌倉與晴空塔散步' },
+          { id: 'lug_3', text: '發熱衣、保暖圍巾、薄手套（看海與高空夜景防風）', note: 'Shibuya Sky 頂樓風大' },
+          { id: 'lug_4', text: '輕便摺疊傘（晴雨兩用）', note: '放隨身小包' },
+          { id: 'lug_5', text: '護唇膏、護手霜與保濕乳液', note: '東京秋冬空氣較乾燥' },
+          { id: 'lug_6', text: '大型摺疊購物袋 ＆ 電子行李秤', note: '錦糸町阿卡將/超市大採買必備' }
+        ]
+      }
+    };
+
+    let checkedState = {};
+    let currentChecklistTab = 'todo';
+
+    function loadChecklistState() {
+      try {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if (saved) {
+          checkedState = JSON.parse(saved);
+        }
+      } catch (e) {
+        checkedState = {};
+      }
+    }
+
+    function saveChecklistState() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(checkedState));
+      } catch (e) {
+        // 忽略無痕模式限制
+      }
+    }
+
+    function toggleCheckItem(itemId) {
+      checkedState[itemId] = !checkedState[itemId];
+      saveChecklistState();
+      renderChecklistItems(false);
+    }
+
+    function resetCurrentChecklist() {
+      const items = defaultChecklists[currentChecklistTab].items;
+      items.forEach(item => {
+        checkedState[item.id] = false;
+      });
+      saveChecklistState();
+      renderChecklistItems(true);
+    }
+
+    function selectChecklistTab(tabKey) {
+      currentChecklistTab = tabKey;
+      const tabs = ['todo', 'pretrip', 'luggage'];
+      tabs.forEach(t => {
+        const btn = document.getElementById(`cl-tab-${t}`);
+        if (t === tabKey) {
+          btn.className = 'ehon-btn bg-yellow py-2 px-2 text-xs sm:text-sm';
+        } else {
+          btn.className = 'ehon-btn bg-washi py-2 px-2 text-xs sm:text-sm opacity-90';
+        }
+      });
+      renderChecklistItems(true);
+    }
+
+    function renderChecklistItems(withBounce = false) {
+      const group = defaultChecklists[currentChecklistTab];
+      const container = document.getElementById('checklist-items-container');
+
+      if (withBounce) {
+        container.classList.remove('bounce-enter');
+        void container.offsetWidth;
+        container.classList.add('bounce-enter');
+      }
+
+      const total = group.items.length;
+      const doneCount = group.items.filter(i => checkedState[i.id]).length;
+      const percent = total > 0 ? Math.round((doneCount / total) * 100) : 0;
+
+      document.getElementById('progress-label').textContent = `${group.title} 完成度`;
+      document.getElementById('progress-count').textContent = `${doneCount} / ${total} (${percent}%)`;
+      document.getElementById('progress-bar-fill').style.width = `${percent}%`;
+
+      container.innerHTML = group.items.map(item => {
+        const isChecked = !!checkedState[item.id];
+        return `
+          <div onclick="toggleCheckItem('${item.id}')"
+               class="checklist-item ${isChecked ? 'checked bg-green/35' : 'bg-cream'} ehon-card-sm p-3 flex items-center gap-3 cursor-pointer select-none">
+            <div class="ehon-checkbox">
+              ${isChecked ? `
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#3E3A39" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+              ` : ''}
+            </div>
+            <div class="flex-1">
+              <div class="item-text font-black text-sm leading-snug">${item.text}</div>
+              <div class="text-xs font-bold opacity-75 mt-0.5">📌 ${item.note}</div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    /* ------------------------------------------
+       初始化頁面
+       ------------------------------------------ */
+    window.addEventListener('DOMContentLoaded', () => {
+      loadChecklistState();
+      selectDay(1);
+      selectKinshichoCategory('malls');
+      selectChecklistTab('todo');
+    });
+  </script>
+</body>
+</html>
